@@ -13,11 +13,11 @@ namespace RedisBoost.Tests
 	{
 		private Mock<IPooledRedisClient> _redisClient;
 		private Func<RedisConnectionStringBuilder, BasicRedisSerializer, IPooledRedisClient> _clientsFactory;
-		private string _connectionString;
+		private string _redisHost;
 		[SetUp]
 		public void Setup()
 		{
-			_connectionString = "data source=127.0.0.1";
+			_redisHost = "127.0.0.1";
 
 			_redisClient = new Mock<IPooledRedisClient>();
 			_redisClient.Setup(c => c.PrepareClientConnection())
@@ -25,7 +25,7 @@ namespace RedisBoost.Tests
 			_redisClient.Setup(c => c.QuitAsync())
 						.Returns(Task<string>.Factory.StartNew(() => { return "OK"; }));
 			_redisClient.Setup(c => c.ConnectionString)
-						.Returns(_connectionString);
+						.Returns(_redisHost);
 			_redisClient.Setup(c => c.State).Returns(ClientState.Connect);
 			_clientsFactory = (sb, s) => _redisClient.Object;
 
@@ -33,7 +33,7 @@ namespace RedisBoost.Tests
 		[Test]
 		public void CreateClient_PoolIsEmtpy_CallsFactoryToCreateClient()
 		{
-			var connectionStringBuilder = new RedisConnectionStringBuilder(_connectionString);
+			var connectionStringBuilder = new RedisConnectionStringBuilder(_redisHost);
 			var factoryWasCalled = false;
 			_clientsFactory = (sb, s) =>
 				{
@@ -49,7 +49,7 @@ namespace RedisBoost.Tests
 		[ExpectedException(typeof(Exception))]
 		public void CreateClient_PoolIsEmtpy_FactoryThrowsException()
 		{
-			var connectionStringBuilder = new RedisConnectionStringBuilder(_connectionString);
+			var connectionStringBuilder = new RedisConnectionStringBuilder(_redisHost);
 			_clientsFactory = (sb, s) => { throw new Exception("some exception"); };
 			//act
 			CreatePool().CreateClientAsync(connectionStringBuilder).Wait();
@@ -57,7 +57,7 @@ namespace RedisBoost.Tests
 		[Test]
 		public void CreateClient_PoolIsEmtpy_PreparesClientConnection()
 		{
-			CreatePool().CreateClientAsync(_connectionString).Wait();
+			CreatePool().CreateClientAsync(_redisHost).Wait();
 			//assert
 			_redisClient.Verify(c => c.PrepareClientConnection());
 		}
@@ -72,8 +72,8 @@ namespace RedisBoost.Tests
 				return _redisClient.Object;
 			};
 			//act
-			CreatePool().CreateClientAsync(_connectionString).Wait();
-			CreatePool().CreateClientAsync(_connectionString).Wait();
+			CreatePool().CreateClientAsync(_redisHost).Wait();
+			CreatePool().CreateClientAsync(_redisHost).Wait();
 			//assert
 			Assert.AreEqual(2, factoryWasCalled);
 		}
@@ -128,7 +128,7 @@ namespace RedisBoost.Tests
 			pool.ReturnClient(_redisClient.Object);
 			Thread.Sleep(1000);
 			_redisClient.Verify(c => c.Destroy());
-			var cli = pool.CreateClientAsync(_connectionString).Result;
+			var cli = pool.CreateClientAsync(_redisHost).Result;
 			Assert.NotNull(cli);
 		}
 
@@ -203,7 +203,7 @@ namespace RedisBoost.Tests
 		{
 			var pool = CreatePool();
 			pool.Dispose();
-			pool.CreateClientAsync(_connectionString).Wait();
+			pool.CreateClientAsync(_redisHost).Wait();
 		}
 		private RedisClientsPool CreatePool(int timeout = 1000, int maxPoolSize = 2, int quitTimeout = 5000)
 		{

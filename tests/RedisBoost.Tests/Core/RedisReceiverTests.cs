@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Moq;
-using RedisBoost.Core.Serialization;
 using NUnit.Framework;
 using RedisBoost.Core.AsyncSocket;
 using RedisBoost.Core.Receiver;

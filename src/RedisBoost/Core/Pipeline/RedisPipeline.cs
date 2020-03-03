@@ -63,15 +63,15 @@ namespace RedisBoost.Core.Pipeline
 
 		public void SendRequestAsync(byte[][] args, Action<Exception, RedisResponse> callBack)
 		{
-			ExecuteCommandAsync(args, new PipelineItem(args, callBack,true));
+			ExecuteCommandAsync(new PipelineItem(args, callBack,true));
 		}
 
 		public void ExecuteCommandAsync(byte[][] args, Action<Exception, RedisResponse> callBack)
 		{
-			ExecuteCommandAsync(args, new PipelineItem(args, callBack,false));
+			ExecuteCommandAsync(new PipelineItem(args, callBack,false));
 		}
 
-		public void ExecuteCommandAsync(byte[][] args,PipelineItem item)
+		private void ExecuteCommandAsync(PipelineItem item)
 		{
 			if (_requestsQueue.Count > MaxQueueSize)
 				SpinWait.SpinUntil(() => _requestsQueue.Count < MaxQueueSize);
