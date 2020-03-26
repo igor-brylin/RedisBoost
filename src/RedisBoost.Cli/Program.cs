@@ -18,23 +18,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 
 namespace RedisBoost.Cli
 {
 	class Program
 	{
 		private static string[] _stringRegExps = new[] { @"^[^""\s]+", @"^""([^""]|\"")+""", @"^'([^']|\')+'" };
-		private static string _base64RegExp = @"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$";
 		static void Main(string[] args)
 		{
+		     var configuration = new ConfigurationBuilder()
+		         .AddJsonFile("appsettings.json", true, true)
+		         .Build();
+
 			var client = (args.Length > 0
 				? RedisClient.ConnectAsync(args[0], int.Parse(args[1])).Result
-				: RedisClient.ConnectAsync(ConfigurationManager.ConnectionStrings["Redis"].ConnectionString).Result);
+				: RedisClient.ConnectAsync(configuration["RedisConnectionString"]).Result);
 
 			using (client)
 			{
@@ -104,8 +105,6 @@ namespace RedisBoost.Cli
 
 		private static CommandDescriptor ParseCmd(string[] arguments)
 		{
-			byte btemp; short stemp; int temp; long ltemp; decimal dtemp; byte[] b64temp;
-
 			var args = new List<object>();
 			foreach (var a in arguments.Skip(1))
 			{
@@ -119,19 +118,6 @@ namespace RedisBoost.Cli
 			return new CommandDescriptor(arguments[0], args.ToArray());
 		}
 
-		private static bool TryParseBase64String(string value, out byte[] result)
-		{
-			result = null;
-			try
-			{
-				result = Convert.FromBase64String(value);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
 		private static string[] SplitCmd(string cmd)
 		{
 			var parts = new List<string>();

@@ -598,11 +598,9 @@ namespace RedisBoost.Tests
 				Assert.Contains("b", result);
 			}
 		}
-		private string ConnectionString
-		{
-			get { return ConfigurationManager.ConnectionStrings["Redis"].ConnectionString; }
-		}
-		private IRedisClient CreateClient()
+		private string ConnectionString => "127.0.0.1";
+
+	    private IRedisClient CreateClient()
 		{
 			var cli = RedisClient.ConnectAsync(connectionString: ConnectionString).Result;
 			cli.FlushDbAsync().Wait();

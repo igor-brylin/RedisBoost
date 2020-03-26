@@ -108,7 +108,7 @@ namespace RedisBoost
 
 		public Task<ChannelMessage> TryReadMessageAsync(ChannelMessageType? messageTypeFilter)
 		{
-			var tcs = new TaskCompletionSource<ChannelMessage>();
+			var tcs = new TaskCompletionSource<ChannelMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
 			ReadDirectResponse().ContinueWith(t => ReadMessageContinuation(t, messageTypeFilter, tcs));
 			return tcs.Task;
 		}

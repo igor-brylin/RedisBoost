@@ -72,21 +72,21 @@ namespace RedisBoost.Core.Channel
 
 		public Task<RedisResponse> ExecuteRedisCommand(byte[][] args)
 		{
-			var tcs = new TaskCompletionSource<RedisResponse>();
+			var tcs = new TaskCompletionSource<RedisResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
 			_pipeline.ExecuteCommandAsync(args, (ex, r) => ProcessRedisResponse(tcs, ex, r));
 			return tcs.Task;
 		}
 
 		public Task<RedisResponse> ReadDirectResponse()
 		{
-			var tcs = new TaskCompletionSource<RedisResponse>();
+			var tcs = new TaskCompletionSource<RedisResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
 			_pipeline.ReadResponseAsync((ex, r) => ProcessRedisResponse(tcs, ex, r));
 			return tcs.Task;
 		}
 
 		public Task SendDirectRequest(byte[][] args)
 		{
-			var tcs = new TaskCompletionSource<bool>();
+			var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
 			_pipeline.SendRequestAsync(args,
 				(ex, r) =>
@@ -116,7 +116,7 @@ namespace RedisBoost.Core.Channel
 		#region connection
 		public Task Connect(EndPoint endPoint)
 		{
-			var tcs = new TaskCompletionSource<bool>();
+			var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 			_pipeline.OpenConnection(endPoint,
 				ex =>
 				{
@@ -131,7 +131,7 @@ namespace RedisBoost.Core.Channel
 
 		public Task Disconnect()
 		{
-			var tcs = new TaskCompletionSource<bool>();
+			var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 			_pipeline.CloseConnection(
 				ex =>
 				{

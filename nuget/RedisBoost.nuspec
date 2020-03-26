@@ -20,7 +20,7 @@
     </releaseNotes>
   </metadata>
   <files>
-    <file src="..\src\RedisBoost\bin\Release\RedisBoost.dll" target="lib\net40\" />
-    <file src="..\src\RedisBoost\bin\Release\RedisBoost.XML" target="lib\net40\" />
+    <file src="..\src\RedisBoost\bin\Release\netstandard2.0\RedisBoost.dll" target="lib\netstandard2.0\" />
+    <file src="..\src\RedisBoost\bin\Release\netstandard2.0\RedisBoost.XML" target="lib\netstandard2.0\" />
    </files>
 </package>

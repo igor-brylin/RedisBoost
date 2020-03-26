@@ -74,7 +74,7 @@ namespace RedisBoost.Core.Pool
 		{
 			ThrowIfDisposed();
 
-			var tcs = new TaskCompletionSource<IRedisClient>();
+			var tcs = new TaskCompletionSource<IRedisClient>(TaskCreationOptions.RunContinuationsAsynchronously);
 
 			var pool = _pools.GetOrAdd(connectionString.ToString(), k => new ConcurrentQueue<PoolItem>());
 
